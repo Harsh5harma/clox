@@ -10,7 +10,7 @@
 */
 
 #include <stdlib.h>
-#include <memory.h>
+#include "../headers/memory.h"
 
 
 void* reallocate(void* pointer, size_t oldSize, size_t newSize) {

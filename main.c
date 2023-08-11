@@ -1,7 +1,7 @@
-#include "common.h"
-#include "chunk.h"
-#include "debug.h"
-#include "vm.h"
+#include "../headers/common.h"
+#include "../headers/chunk.h"
+#include "../disassembler/debug.h"
+#include "../headers/vm.h"
 
 int main(int argc, const char* argv[]) {
   initVM();

@@ -1,6 +1,6 @@
 #include "common.h"
-#include "vm.h"
-#include "debug.h"
+#include "../headers/vm.h"
+#include "../disassembler/debug.h"
 #include <stdio.h>
 
 VM vm;
