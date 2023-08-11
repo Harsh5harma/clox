@@ -1,4 +1,4 @@
-#include "common.h"
+#include "../headers/common.h"
 #include "../headers/vm.h"
 #include "../disassembler/debug.h"
 #include <stdio.h>
