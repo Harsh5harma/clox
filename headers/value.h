@@ -3,8 +3,39 @@
 
 #include "common.h"
 
-typedef double Value;
+typedef enum {
+  VAL_BOOL,
+  VAL_NIL,
+  VAL_NUMBER,
+} ValueType;
 
+typedef struct {
+  ValueType type;
+  union {
+    bool boolean;
+    double number;
+  } as;
+} Value;
+
+
+// Any time we call a AS_ macro, we need to use these IS_ macros as guards 
+#define IS_BOOL(value)      ((value).type == VAL_BOOL)
+#define IS_NIL(value)       ((value).type == VAL_NIL)
+#define IS_NUMBER(value)    ((value).type == VAL_NUMBER)
+
+// It's not safe to use any of the AS_ macros unless we know the value contains the appropriate type.
+#define AS_BOOL(value)      ((value).as.boolean)
+#define AS_NUMBER(value)    ((value).as.number)
+
+#define BOOL_VAL(value)         ((Value){VAL_BOOL, {.boolean = value}})
+/*
+  code is a simplified version of this
+  Value x;
+  x.type = VAL_BOOL;
+  x.as.boolean = value;
+*/
+#define NIL_VAL                 ((Value){VAL_NIL, {.number = 0}})
+#define NUMBER_VAL(value)       ((Value){VAL_NUMBER, {.number = value}})
 
 typedef struct {
   int capacity;
@@ -12,6 +43,7 @@ typedef struct {
   Value* values;
 } ValueArray;
 
+bool valuesEqual(Value a, Value b);
 void initValueArray(ValueArray* array);
 void writeValueArray(ValueArray* array, Value value);
 void freeValueArray(ValueArray* array);
