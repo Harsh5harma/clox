@@ -1,7 +1,7 @@
 cc = gcc
 cflags = -Wall
 
-source = ./code/chunk.c  ./code/memory.c ./code/value.c ./code/vm.c ./disassembler/debug.c
+source = ./code/chunk.c  ./code/memory.c ./code/value.c ./disassembler/debug.c  ./code/compiler.c ./code/vm.c ./code/scanner.c
 
 compile: $(source) main.c
 	$(cc) $(cflags) $(source) main.c -o main  
