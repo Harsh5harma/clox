@@ -122,10 +122,34 @@ static InterpretResult run() {
       case OP_TRUE: push(BOOL_VAL(true)); break;
       case OP_FALSE: push(BOOL_VAL(false)); break;
       case OP_POP: pop(); break;
+      case OP_GET_GLOBAL: {
+        ObjString* name = READ_STRING();
+        Value value;
+        // We pull the constant table index from the instruction’s operand and get the variable name.
+        // Then we use that as a key to look up the variable’s value in the globals hash table.
+        if (!tableGet(&vm.globals, name, &value)) {
+          runtimeError("Undefined variable '%s'.", name->chars);
+          return INTERPRET_RUNTIME_ERROR;
+        }
+        push(value);
+        break;
+      }
       case OP_DEFINE_GLOBAL: {
         ObjString* name = READ_STRING();
         tableSet(&vm.globals, name, peek(0));
         pop();
+        break;
+      }
+      case OP_SET_GLOBAL : {
+        ObjString* name = READ_STRING();
+        // if the variable hasn't been defined yet, its a runtime error to try and assign it
+        // Setting a variable doesn't pop the value off the stack. Since assignment is an expression, so it needs to leave that
+        // value there in case the assignment is nested inside some larger expression.
+        if (tableSet(&vm.globals, name, peek(0))) {
+          tableDelete(&vm.globals, name);
+          runtimeError("Undefined variable '%s'.", name->chars);
+          return INTERPRET_RUNTIME_ERROR;
+        }
         break;
       }
       case OP_EQUAL: {
