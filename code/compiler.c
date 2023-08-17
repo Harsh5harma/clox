@@ -412,6 +412,8 @@ static void statement() {
   */
   if (match(TOKEN_PRINT)) {
     printStatement();
+  } else {
+    expressionStatement();
   }
 }
 

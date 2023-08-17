@@ -1,13 +1,15 @@
 cc = gcc
 cflags = -Wall -w
 
-source = ./code/chunk.c ./code/memory.c ./code/value.c ./disassembler/debug.c ./code/compiler.c ./code/vm.c ./code/scanner.c ./code/object.c ./code/table.c
+src_dir = ./code
+disasm_dir = ./disassembler
+obj_dir = ./obj
 
-main: $(source) main.c
-	$(cc) $(cflags) $(source) main.c -o main
+source = $(wildcard $(src_dir)/*.c) $(wildcard $(disasm_dir)/*.c)
+objects = $(patsubst %.c, $(obj_dir)/%.o, $(notdir $(source)))
 
-.PHONY: compile
-compile: main
+main: $(objects) main.c
+	$(cc) $(cflags) $(objects) main.c -o main
 
 .PHONY: run
 run: main
@@ -15,7 +17,16 @@ run: main
 
 .PHONY: clean
 clean:
-	rm -f main
+	rm -f main $(objects)
 
 .PHONY: all
-all: clean compile run
+all: clean main run
+
+$(obj_dir)/%.o: $(src_dir)/%.c | $(obj_dir)
+	$(cc) $(cflags) -c $< -o $@
+
+$(obj_dir)/%.o: $(disasm_dir)/%.c | $(obj_dir)
+	$(cc) $(cflags) -c $< -o $@
+
+$(obj_dir):
+	mkdir -p $(obj_dir)
