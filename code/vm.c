@@ -122,6 +122,23 @@ static InterpretResult run() {
       case OP_TRUE: push(BOOL_VAL(true)); break;
       case OP_FALSE: push(BOOL_VAL(false)); break;
       case OP_POP: pop(); break;
+      case OP_GET_LOCAL: {
+        /*
+        It takes a single-byte operand for the stack slot where the local lives. 
+        It loads the value from that index and then pushes it on top of the stack where later instructions can find it.
+        Kind of redudant, since we're popping a value that already is down there in the stack. But that's how stack based bytecode instructions operate.
+        Register based bytecode is better in this aspect that it juggles around the stack, but the instructions are larger and operands are more.
+        */
+        uint8_t slot = READ_BYTE();
+        push(vm.stack[slot]);
+        break;
+      }
+      case OP_SET_LOCAL: {
+        // It takes the assigned value from the top of the stack and stores it in the stack slot corresponding to the local variable
+        uint8_t slot = READ_BYTE();
+        vm.stack[slot] = peek(0);
+        break;
+      }
       case OP_GET_GLOBAL: {
         ObjString* name = READ_STRING();
         Value value;
