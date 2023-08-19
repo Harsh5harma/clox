@@ -81,6 +81,7 @@ static InterpretResult run() {
   #define READ_BYTE() (*vm.ip++)
   #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
   #define READ_STRING()   AS_STRING(READ_CONSTANT());
+  #define READ_SHORT()    (vm.ip += 2, (uint16_t)((vm.ip[-2] << 8) | (vm.ip[-1])))
 
   // Using a do while loop in the macro looks funny, but it gives you a way to contain multiple statements
   // inside a block that also permits a semicolon at the end.
@@ -210,6 +211,21 @@ static InterpretResult run() {
         printf("\n");
         break;
       }
+      case OP_JUMP: {
+        uint16_t offset = READ_SHORT();
+
+        // unlike if-else, this jump isn't optional.
+        vm.ip += offset;
+        break;
+      }
+      case OP_JUMP_IF_FALSE: {
+        // get the actual length of the if then block.
+        uint16_t offset = READ_SHORT();
+
+        // if the statement is falsey, jump over it by the offset your compiler calculated.
+        if (isFalsey(peek(0))) vm.ip += offset;
+        break;
+      }
       case OP_RETURN: {
         return INTERPRET_OK;
       }
@@ -219,6 +235,7 @@ static InterpretResult run() {
   #undef READ_BYTE
   #undef READ_CONSTANT
   #undef READ_STRING
+  #undef READ_SHORT
   #undef BINARY_OP
 }
 
